@@ -1,0 +1,82 @@
+{{> partials/menu}}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <form class="form-horizontal" id="productNewForm" data-toggle="validator">
+        <div class="col-12">
+            <div class="page-header">
+                <div class="float-right">
+                    <button id="frm_edit_product_save" class="btn btn-outline-success" type="submit">Agregar producto</button>
+                </div>
+                <h2>{{ @root.__ "Nuevo producto" }}</h2>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label for="productTitle" class="control-label">{{ @root.__ "Titulo de producto" }} *</label>
+                <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{productTitle}}" required/>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="productPrice" class="control-label">{{ @root.__ "Precio de producto" }} *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text">{{currencySymbol config.currencySymbol}}</label>
+                    </div>
+                    <input type="number" id="productPrice" class="form-control" step="any" value="{{productPrice}}" required/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="productPublished" class="control-label">{{ @root.__ "Estado" }}</label>
+                <select class="form-control" id="productPublished">
+                    <option value="true" selected>{{ @root.__ "Publicado" }}</option>
+                    <option value="false">{{ @root.__ "Borrador" }}</option>
+                </select>
+            </div>
+        </div>
+        {{#if config.trackStock}}
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="productStock" class="control-label">{{ @root.__ "Stock level" }}</label>
+                <input type="number" id="productStock" class="form-control" value="{{productStock}}" step="any" />
+            </div>
+        </div>
+        {{/if}}
+        <div class="col-12">
+            <div class="form-group" id="editor-wrapper">
+                <label for="editor" class="control-label">{{ @root.__ "Descripcion del producto" }} *</label>
+                <textarea minlength="5" rows="10" id="productDescription" class="form-control" required>{{productDescription}}</textarea>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label class="control-label">Permalink</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="productPermalink" placeholder="Permalink for the article" value={{productPermalink}}>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-success" id="validatePermalink" type="button">Validate</button>
+                    </div>
+                </div>
+                <p class="help-block">{{ @root.__ "This sets a readable URL for the product" }}</p>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label for="productTags" class="control-label">Etiquetas del producto</label>
+                <input type="text" class="form-control" id="productTags">
+                <p class="help-block">{{ @root.__ "Las etiquetas hace que sea mas facil encontrar y filtrar productos." }}</p>
+            </div>
+        </div>
+    </form>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+<script>
+    $(document).ready(function() {
+        $('#productDescription').summernote({
+            height: 300,
+            minHeight: null
+        });
+    });
+</script>

@@ -1,0 +1,90 @@
+{{> partials/menu}}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+  <form id="settingsForm" data-toggle="validator">
+    <div class="col-sm-12">
+        <h2>{{ @root.__ "Configuracion general" }} <span class="float-right"><button type="submit" id="btnSettingsUpdate" class="btn btn-outline-success">{{ @root.__ "Guardar" }}</button></span></h2>
+    </div>
+    <div class="col-md-12">
+            <div class="form-group">
+                <label>{{ @root.__ "Nombre de empresa" }} *</label>
+                <input type="text" class="form-control" name="cartTitle" value="{{config.cartTitle}}" required>
+                <p class="help-block">
+                    {{ @root.__ "Este elemento es usado para motores de búsqueda. El nombre se muestra si su logotipo está oculto." }}
+                </p>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Descripcion" }} *</label>
+                <input type="text" class="form-control" name="cartDescription" value="{{config.cartDescription}}" required>
+                <p class="help-block">{{ @root.__ "Esta descripción se muestra cuándo su sitio web aparece en los resultados del motor de búsqueda." }}</p>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Logo images/logo" }}</label>
+                <input type="text" class="form-control" name="cartLogo" value="{{config.cartLogo}}">
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "URL" }} *</label>
+                <input type="text" class="form-control" name="baseUrl" value="{{config.baseUrl}}" required>
+                <p class="help-block">{{ @root.__ "Esta URL se usa en mapas del sitio." }}</p>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Email" }} *</label>
+                <input type="email" class="form-control" name="emailAddress" value="{{config.emailAddress}}" required>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Simbolo actual" }}</label>
+                <input type="text" class="form-control" name="currencySymbol" value="{{currencySymbol config.currencySymbol}}">
+                <p class="help-block">{{ @root.__ "Establezca esto en su símbolo de moneda. Ej: $, £, €" }}</p>
+            </div>
+            {{#ifCond config.paymentGateway '==' 'blockonomics'}}
+            <div class="form-group">
+                <label>{{ @root.__ "Currency ISO" }}</label>
+                <select class="form-control" name="currencyISO">
+                    <option {{selectState 'USD' config.currencyISO}} value="USD">USD</option>
+                    <option {{selectState 'EUR' config.currencyISO}} value="EUR">EUR</option>
+                    <option {{selectState 'GBP' config.currencyISO}} value="GBP">GBP</option>
+                </select>
+                <p class="help-block">{{ @root.__ "Currency used for Blockonomics conversion" }}</p>
+            </div>
+            {{/ifCond}}          
+            <div class="form-group">
+                <label>{{ @root.__ "Productos por fila" }}</label>
+                <select class="form-control" name="productsPerRow">
+                    <option value="{{config.productsPerRow}}" hidden="hidden" selected="selected">{{config.productsPerRow}}</option>
+                    <option {{selectState '1' config.productsPerRow}}>1</option>
+                    <option {{selectState '2' config.productsPerRow}}>2</option>
+                    <option {{selectState '3' config.productsPerRow}}>3</option>
+                    <option {{selectState '4' config.productsPerRow}}>4</option>
+                </select>
+                <p class="help-block">{{ @root.__ "El número de productos por fila que se mostrarán en la página." }}</p>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Productos por pagina" }}</label>
+                <input type="number" class="form-control" name="productsPerPage" value="{{config.productsPerPage}}">
+                <p class="help-block">{{ @root.__ "El número de productos que se mostrarán en cada página." }}</p>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Menu Enabled" }}: </label>
+                <div class="checkbox">
+                    <label>
+                        <input class="settingsMenuEnabled" type="checkbox" {{checkedState config.menuEnabled}} id="menuEnabled"
+                            name="menuEnabled">
+                    </label>
+                </div>
+                <p class="help-block">{{{ @root.__ "Menu_Enabled_Info" }}}</p>
+            </div>
+            <div class="form-group">
+                <label>{{ @root.__ "Menu header" }}</label>
+                <input type="text" class="form-control" name="menuTitle" value="{{config.menuTitle}}" placeholder="Menu">
+                <p class="help-block">{{ @root.__ "El texto del encabezado de su menú." }}</p>
+            </div>
+
+            <div class="form-group">
+                <label>Google analytics</label>
+                <textarea class="form-control" rows="3" id="googleAnalytics" name="googleAnalytics">{{googleAnalytics}}</textarea>
+                <input type="hidden" id="googleAnalytics_input" name="googleAnalytics_input">
+                <p class="help-block">{{{ @root.__ "Google_Analytics_Info" }}}
+                </p>
+            </div>
+    </div>
+  </form>
+</main>

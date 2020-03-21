@@ -1,0 +1,9 @@
+.env
+/node_modules
+data/
+public/uploads
+/config/*-local.json
+.vscode
+**.DS_Store
+env.yaml
+ecosystem.config.js

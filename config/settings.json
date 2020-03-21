@@ -1,0 +1,48 @@
+{
+    "cartTitle": "Tecni Aluvid",
+    "cartDescription": "Vidriería Zamora Elaboración de muebles de aluminio y vidrio, Perchas Metallica, Trabajos en Melamina, MDF, Puertas Enrollables",
+    "cartLogo": "/uploads/logo-tecnialuvid.png",
+    "baseUrl": "http://localhost:1111",
+    "emailHost": "smtp-mail.outlook.com",
+    "emailPort": 587,
+    "emailSecure": false,
+    "emailUser": "paulo@test.com",
+    "emailPassword": "this_is_the_smtp_password",
+    "emailAddress": "paulo@test.com",
+    "menuEnabled": true,
+    "productsPerRow": 4,
+    "productsPerPage": 12,
+    "menuTitle": "Menu",
+    "footerHtml": "",
+    "googleAnalytics": "&lt;!-- Global site tag (gtag.js) - Google Analytics --&gt;\r\n&lt;script async src=&quot;https://www.googletagmanager.com/gtag/js?id=UA-7038832-30&quot;&gt;&lt;/script&gt;\r\n&lt;script&gt;\r\n  window.dataLayer = window.dataLayer || [];\r\n  function gtag(){dataLayer.push(arguments);}\r\n  gtag(&apos;js&apos;, new Date());\r\n  gtag(&apos;config&apos;, &apos;UA-7038832-30&apos;);\r\n&lt;/script&gt;",
+    "injectJs": "",
+    "customCss": "",
+    "currencySymbol": "$",
+    "paymentGateway": "stripe",
+    "databaseConnectionString": "mongodb://127.0.0.1:27017/expresscart",
+    "theme": "Cloth",
+    "trackStock": false,
+    "orderHook": "",
+    "availableLanguages": [
+        "en",
+        "it"
+    ],
+    "defaultLocale": "en",
+    "maxQuantity": 25,
+    "twitterHandle": "",
+    "facebookAppId": "",
+    "modules": {
+        "enabled": {
+            "shipping": "shipping-basic",
+            "discount": "discount-voucher"
+        },
+        "loaded": {
+            "shipping": {},
+            "discount": {}
+        }
+    },
+    "secretCookie": "d5d55dfd15e2b420960ec1c3278a40a1a9bf78b0",
+    "secretSession": "db9f891551b317932b51833176d5bdd98eaeb3d3",
+    "themeViews": "../views/themes/Cloth/",
+    "env": ""
+}

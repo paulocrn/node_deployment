@@ -1,5 +1,5 @@
 .env
-/node_modules
+node_modules
 data/
 public/uploads
 /config/*-local.json
@@ -7,3 +7,4 @@ public/uploads
 **.DS_Store
 env.yaml
 ecosystem.config.js
+README.md

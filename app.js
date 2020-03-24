@@ -475,7 +475,7 @@ app.on('uncaughtException', (err) => {
     process.exit(2);
 });
 
-initDb('mongodb+srv://paulo:1234@cluster0-ddi8n.mongodb.net/test?retryWrites=true&w=majority', async(err, db) => {
+initDb(process.env.databaseConnectionString || 'mongodb+srv://paulo:1234@cluster0-ddi8n.mongodb.net/test?retryWrites=true&w=majority', async(err, db) => {
     // On connection error we display then exit
     if (err) {
         console.log(colors.red('Error connecting to MongoDB: ' + err));

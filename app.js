@@ -21,10 +21,10 @@ const helmet = require('helmet');
 const colors = require('colors');
 const cron = require('node-cron');
 const crypto = require('crypto');
-const common = require('./lib/common');
-const { runIndexing } = require('./lib/indexing');
-const { addSchemas } = require('./lib/schema');
-const { initDb, getDbUri } = require('./lib/db');
+const common = require('D:/expressCart-master/lib/common');
+const { runIndexing } = require('D:/expressCart-master/lib/indexing');
+const { addSchemas } = require('D:/expressCart-master/lib/schema');
+const { initDb, getDbUri } = require('D:/expressCart-master/lib/db');
 let handlebars = require('express-handlebars');
 const i18n = require('i18n');
 
@@ -35,7 +35,7 @@ const ajv = new Ajv({ useDefaults: true });
 // get config
 const config = common.getConfig();
 
-const baseConfig = ajv.validate(require('./config/baseSchema'), config);
+const baseConfig = ajv.validate(require('D:/expressCart-master/config/baseSchema'), config);
 if (baseConfig === false) {
     console.log(colors.red(`settings.json incorrect: ${ajv.errorsText()}`));
     process.exit(2);

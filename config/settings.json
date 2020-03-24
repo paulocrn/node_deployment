@@ -43,6 +43,6 @@
     },
     "secretCookie": "d5d55dfd15e2b420960ec1c3278a40a1a9bf78b0",
     "secretSession": "db9f891551b317932b51833176d5bdd98eaeb3d3",
-    "themeViews": "../views/themes/Cloth/",
+    "themeViews": "D:/expressCart-master/views/themes/Cloth/",
     "env": ""
 }

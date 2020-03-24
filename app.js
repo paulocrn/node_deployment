@@ -79,18 +79,18 @@ switch (config.paymentGateway) {
 }
 
 // require the routes
-const index = require('./routes/index');
-const admin = require('./routes/admin');
-const product = require('./routes/product');
-const customer = require('./routes/customer');
-const order = require('./routes/order');
-const user = require('./routes/user');
-const paypal = require('./routes/payments/paypal');
-const stripe = require('./routes/payments/stripe');
-const blockonomics = require('./routes/payments/blockonomics');
-const authorizenet = require('./routes/payments/authorizenet');
-const adyen = require('./routes/payments/adyen');
-const instore = require('./routes/payments/instore');
+const index = require('D:/expressCart-master/routes/index');
+const admin = require('D:/expressCart-master/routes/admin');
+const product = require('D:/expressCart-master/routes/product');
+const customer = require('D:/expressCart-master/routes/customer');
+const order = require('D:/expressCart-master/routes/order');
+const user = require('D:/expressCart-master/routes/user');
+const paypal = require('D:/expressCart-master/routes/payments/paypal');
+const stripe = require('D:/expressCart-master/routes/payments/stripe');
+const blockonomics = require('D:/expressCart-master/routes/payments/blockonomics');
+const authorizenet = require('D:/expressCart-master/routes/payments/authorizenet');
+const adyen = require('D:/expressCart-master/routes/payments/adyen');
+const instore = require('D:/expressCart-master/routes/payments/instore');
 
 const app = express();
 

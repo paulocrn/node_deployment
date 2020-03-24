@@ -1,15 +1,15 @@
 const express = require('express');
-const common = require('../lib/common');
-const { restrict, checkAccess } = require('../lib/auth');
-const { indexProducts } = require('../lib/indexing');
-const { validateJson } = require('../lib/schema');
+const common = require('D:/expressCart-master/lib/common');
+const { restrict, checkAccess } = require('D:/expressCart-master/lib/auth');
+const { indexProducts } = require('D:/expressCart-master/lib/indexing');
+const { validateJson } = require('D:/expressCart-master/lib/schema');
 const colors = require('colors');
 const rimraf = require('rimraf');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
-router.get('/admin/products', restrict, async (req, res, next) => {
+router.get('/admin/products', restrict, async(req, res, next) => {
     const db = req.app.db;
     // get the top results
     const topResults = await db.products.find({}).sort({ productAddedDate: -1 }).limit(10).toArray();
@@ -26,7 +26,7 @@ router.get('/admin/products', restrict, async (req, res, next) => {
     });
 });
 
-router.get('/admin/products/filter/:search', restrict, async (req, res, next) => {
+router.get('/admin/products/filter/:search', restrict, async(req, res, next) => {
     const db = req.app.db;
     const searchTerm = req.params.search;
     const productsIndex = req.app.productsIndex;
@@ -39,7 +39,7 @@ router.get('/admin/products/filter/:search', restrict, async (req, res, next) =>
     // we search on the lunr indexes
     const results = await db.products.find({ _id: { $in: lunrIdArray } }).toArray();
 
-    if(req.apiAuthenticated){
+    if (req.apiAuthenticated) {
         res.status(200).json(results);
         return;
     }
@@ -77,15 +77,15 @@ router.get('/admin/product/new', restrict, checkAccess, (req, res) => {
 });
 
 // insert new product form action
-router.post('/admin/product/insert', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/insert', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
     // Process supplied options
     let productOptions = req.body.productOptions;
-    if(productOptions && typeof productOptions !== 'object'){
-        try{
+    if (productOptions && typeof productOptions !== 'object') {
+        try {
             productOptions = JSON.parse(req.body.productOptions);
-        }catch(ex){
+        } catch (ex) {
             console.log('Failure to parse options');
         }
     }
@@ -105,7 +105,7 @@ router.post('/admin/product/insert', restrict, checkAccess, async (req, res) => 
 
     // Validate the body again schema
     const schemaValidate = validateJson('newProduct', doc);
-    if(!schemaValidate.result){
+    if (!schemaValidate.result) {
         console.log('schemaValidate errors', schemaValidate.errors);
         res.status(400).json(schemaValidate.errors);
         return;
@@ -113,39 +113,39 @@ router.post('/admin/product/insert', restrict, checkAccess, async (req, res) => 
 
     // Check permalink doesn't already exist
     const product = await db.products.countDocuments({ productPermalink: req.body.productPermalink });
-    if(product > 0 && req.body.productPermalink !== ''){
+    if (product > 0 && req.body.productPermalink !== '') {
         res.status(400).json({ message: 'Permalink already exists. Pick a new one.' });
         return;
     }
 
-    try{
+    try {
         const newDoc = await db.products.insertOne(doc);
         // get the new ID
         const newId = newDoc.insertedId;
 
         // add to lunr index
         indexProducts(req.app)
-        .then(() => {
-            res.status(200).json({
-                message: 'New product successfully created',
-                productId: newId
+            .then(() => {
+                res.status(200).json({
+                    message: 'New product successfully created',
+                    productId: newId
+                });
             });
-        });
-    }catch(ex){
+    } catch (ex) {
         console.log(colors.red('Error inserting document: ' + ex));
         res.status(400).json({ message: 'Error inserting document' });
     }
 });
 
 // render the editor
-router.get('/admin/product/edit/:id', restrict, checkAccess, async (req, res) => {
+router.get('/admin/product/edit/:id', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
     const images = await common.getImages(req.params.id, req, res);
     const product = await db.products.findOne({ _id: common.getId(req.params.id) });
-    if(!product){
+    if (!product) {
         // If API request, return json
-        if(req.apiAuthenticated){
+        if (req.apiAuthenticated) {
             res.status(400).json({ message: 'Product not found' });
             return;
         }
@@ -155,15 +155,15 @@ router.get('/admin/product/edit/:id', restrict, checkAccess, async (req, res) =>
         return;
     }
     let options = {};
-    if(product.productOptions){
+    if (product.productOptions) {
         options = product.productOptions;
-        if(typeof product.productOptions !== 'object'){
+        if (typeof product.productOptions !== 'object') {
             options = JSON.parse(product.productOptions);
         }
     }
 
     // If API request, return json
-    if(req.apiAuthenticated){
+    if (req.apiAuthenticated) {
         res.status(200).json(product);
         return;
     }
@@ -184,22 +184,22 @@ router.get('/admin/product/edit/:id', restrict, checkAccess, async (req, res) =>
 });
 
 // Remove option from product
-router.post('/admin/product/removeoption', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/removeoption', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
     const product = await db.products.findOne({ _id: common.getId(req.body.productId) });
-    if(product && product.productOptions){
+    if (product && product.productOptions) {
         const opts = product.productOptions;
         delete opts[req.body.optName];
 
-        try{
+        try {
             const updateOption = await db.products.findOneAndUpdate({ _id: common.getId(req.body.productId) }, { $set: { productOptions: opts } });
-            if(updateOption.ok === 1){
+            if (updateOption.ok === 1) {
                 res.status(200).json({ message: 'Option successfully removed' });
                 return;
             }
             res.status(400).json({ message: 'Failed to remove option. Please try again.' });
             return;
-        }catch(ex){
+        } catch (ex) {
             res.status(400).json({ message: 'Failed to remove option. Please try again.' });
             return;
         }
@@ -208,27 +208,27 @@ router.post('/admin/product/removeoption', restrict, checkAccess, async (req, re
 });
 
 // Update an existing product form action
-router.post('/admin/product/update', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/update', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
     const product = await db.products.findOne({ _id: common.getId(req.body.productId) });
 
-    if(!product){
+    if (!product) {
         res.status(400).json({ message: 'Failed to update product' });
         return;
     }
     const count = await db.products.countDocuments({ productPermalink: req.body.productPermalink, _id: { $ne: common.getId(product._id) } });
-    if(count > 0 && req.body.productPermalink !== ''){
+    if (count > 0 && req.body.productPermalink !== '') {
         res.status(400).json({ message: 'Permalink already exists. Pick a new one.' });
         return;
     }
     const images = await common.getImages(req.body.productId, req, res);
     // Process supplied options
     let productOptions = req.body.productOptions;
-    if(productOptions && typeof productOptions !== 'object'){
-        try{
+    if (productOptions && typeof productOptions !== 'object') {
+        try {
             productOptions = JSON.parse(req.body.productOptions);
-        }catch(ex){
+        } catch (ex) {
             console.log('Failure to parse options');
         }
     }
@@ -248,7 +248,7 @@ router.post('/admin/product/update', restrict, checkAccess, async (req, res) => 
 
     // Validate the body again schema
     const schemaValidate = validateJson('editProduct', productDoc);
-    if(!schemaValidate.result){
+    if (!schemaValidate.result) {
         res.status(400).json(schemaValidate.errors);
         return;
     }
@@ -257,30 +257,30 @@ router.post('/admin/product/update', restrict, checkAccess, async (req, res) => 
     delete productDoc.productId;
 
     // if no featured image
-    if(!product.productImage){
-        if(images.length > 0){
+    if (!product.productImage) {
+        if (images.length > 0) {
             productDoc.productImage = images[0].path;
-        }else{
+        } else {
             productDoc.productImage = '/uploads/placeholder.png';
         }
-    }else{
+    } else {
         productDoc.productImage = product.productImage;
     }
 
-    try{
+    try {
         await db.products.updateOne({ _id: common.getId(req.body.productId) }, { $set: productDoc }, {});
         // Update the index
         indexProducts(req.app)
-        .then(() => {
-            res.status(200).json({ message: 'Successfully saved', product: productDoc });
-        });
-    }catch(ex){
+            .then(() => {
+                res.status(200).json({ message: 'Successfully saved', product: productDoc });
+            });
+    } catch (ex) {
         res.status(400).json({ message: 'Failed to save. Please try again' });
     }
 });
 
 // delete a product
-router.post('/admin/product/delete', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/delete', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
     // remove the product
@@ -288,73 +288,73 @@ router.post('/admin/product/delete', restrict, checkAccess, async (req, res) => 
 
     // delete any images and folder
     rimraf('public/uploads/' + req.body.productId, (err) => {
-        if(err){
+        if (err) {
             console.info(err.stack);
             res.status(400).json({ message: 'Failed to delete product' });
         }
 
         // re-index products
         indexProducts(req.app)
-        .then(() => {
-            res.status(200).json({ message: 'Product successfully deleted' });
-        });
+            .then(() => {
+                res.status(200).json({ message: 'Product successfully deleted' });
+            });
     });
 });
 
 // update the published state based on an ajax call from the frontend
-router.post('/admin/product/publishedState', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/publishedState', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
-    try{
+    try {
         await db.products.updateOne({ _id: common.getId(req.body.id) }, { $set: { productPublished: common.convertBool(req.body.state) } }, { multi: false });
         res.status(200).json({ message: 'Published state updated' });
-    }catch(ex){
+    } catch (ex) {
         console.error(colors.red('Failed to update the published state: ' + ex));
         res.status(400).json({ message: 'Published state not updated' });
     }
 });
 
 // set as main product image
-router.post('/admin/product/setasmainimage', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/setasmainimage', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
-    try{
+    try {
         // update the productImage to the db
         await db.products.updateOne({ _id: common.getId(req.body.product_id) }, { $set: { productImage: req.body.productImage } }, { multi: false });
         res.status(200).json({ message: 'Main image successfully set' });
-    }catch(ex){
+    } catch (ex) {
         res.status(400).json({ message: 'Unable to set as main image. Please try again.' });
     }
 });
 
 // deletes a product image
-router.post('/admin/product/deleteimage', restrict, checkAccess, async (req, res) => {
+router.post('/admin/product/deleteimage', restrict, checkAccess, async(req, res) => {
     const db = req.app.db;
 
     // get the productImage from the db
     const product = await db.products.findOne({ _id: common.getId(req.body.product_id) });
-    if(!product){
+    if (!product) {
         res.status(400).json({ message: 'Product not found' });
         return;
     }
-    if(req.body.productImage === product.productImage){
+    if (req.body.productImage === product.productImage) {
         // set the productImage to null
         await db.products.updateOne({ _id: common.getId(req.body.product_id) }, { $set: { productImage: null } }, { multi: false });
 
         // remove the image from disk
         fs.unlink(path.join('public', req.body.productImage), (err) => {
-            if(err){
+            if (err) {
                 res.status(400).json({ message: 'Image not removed, please try again.' });
-            }else{
+            } else {
                 res.status(200).json({ message: 'Image successfully deleted' });
             }
         });
-    }else{
+    } else {
         // remove the image from disk
         fs.unlink(path.join('public', req.body.productImage), (err) => {
-            if(err){
+            if (err) {
                 res.status(400).json({ message: 'Image not removed, please try again.' });
-            }else{
+            } else {
                 res.status(200).json({ message: 'Image successfully deleted' });
             }
         });

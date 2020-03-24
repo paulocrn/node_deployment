@@ -1,16 +1,16 @@
 const express = require('express');
-const common = require('../lib/common');
-const { restrict } = require('../lib/auth');
+const common = require('D:/expressCart-master/lib/common');
+const { restrict } = require('D:/expressCart-master/lib/auth');
 const colors = require('colors');
 const bcrypt = require('bcryptjs');
-const { validateJson } = require('../lib/schema');
+const { validateJson } = require('D:/expressCart-master/lib/schema');
 const router = express.Router();
 
-router.get('/admin/users', restrict, async (req, res) => {
+router.get('/admin/users', restrict, async(req, res) => {
     const db = req.app.db;
     const users = await db.users.find({}, { projection: { userPassword: 0 } }).toArray();
 
-    if(req.apiAuthenticated){
+    if (req.apiAuthenticated) {
         res.status(200).json(users);
         return;
     }
@@ -29,13 +29,13 @@ router.get('/admin/users', restrict, async (req, res) => {
 });
 
 // edit user
-router.get('/admin/user/edit/:id', restrict, async (req, res) => {
+router.get('/admin/user/edit/:id', restrict, async(req, res) => {
     const db = req.app.db;
     const user = await db.users.findOne({ _id: common.getId(req.params.id) });
 
     // Check user is found
-    if(!user){
-        if(req.apiAuthenticated){
+    if (!user) {
+        if (req.apiAuthenticated) {
             res.status(400).json({ message: 'User not found' });
             return;
         }
@@ -48,8 +48,8 @@ router.get('/admin/user/edit/:id', restrict, async (req, res) => {
 
     // if the user we want to edit is not the current logged in user and the current user is not
     // an admin we render an access denied message
-    if(user.userEmail !== req.session.user && req.session.isAdmin === false){
-        if(req.apiAuthenticated){
+    if (user.userEmail !== req.session.user && req.session.isAdmin === false) {
+        if (req.apiAuthenticated) {
             res.status(400).json({ message: 'Access denied' });
             return;
         }
@@ -86,17 +86,17 @@ router.get('/admin/user/new', restrict, (req, res) => {
 });
 
 // delete a user
-router.post('/admin/user/delete', restrict, async (req, res) => {
+router.post('/admin/user/delete', restrict, async(req, res) => {
     const db = req.app.db;
 
     // userId
-    if(req.session.isAdmin !== true){
+    if (req.session.isAdmin !== true) {
         res.status(400).json({ message: 'Access denied' });
         return;
     }
 
     // Cannot delete your own account
-    if(req.session.userId === req.body.userId){
+    if (req.session.userId === req.body.userId) {
         res.status(400).json({ message: 'Unable to delete own user account' });
         return;
     }
@@ -104,22 +104,22 @@ router.post('/admin/user/delete', restrict, async (req, res) => {
     const user = await db.users.findOne({ _id: common.getId(req.body.userId) });
 
     // If user is not found
-    if(!user){
+    if (!user) {
         res.status(400).json({ message: 'User not found.' });
         return;
     }
 
     // Cannot delete the original user/owner
-    if(user.isOwner){
+    if (user.isOwner) {
         res.status(400).json({ message: 'Access denied.' });
         return;
     }
 
-    try{
+    try {
         await db.users.deleteOne({ _id: common.getId(req.body.userId) }, {});
         res.status(200).json({ message: 'User deleted.' });
         return;
-    }catch(ex){
+    } catch (ex) {
         console.log('Failed to delete user', ex);
         res.status(200).json({ message: 'Cannot delete user' });
         return;
@@ -127,7 +127,7 @@ router.post('/admin/user/delete', restrict, async (req, res) => {
 });
 
 // update a user
-router.post('/admin/user/update', restrict, async (req, res) => {
+router.post('/admin/user/update', restrict, async(req, res) => {
     const db = req.app.db;
 
     let isAdmin = req.body.userAdmin === 'on';
@@ -136,19 +136,19 @@ router.post('/admin/user/update', restrict, async (req, res) => {
     const user = await db.users.findOne({ _id: common.getId(req.body.userId) });
 
     // If user not found
-    if(!user){
+    if (!user) {
         res.status(400).json({ message: 'User not found' });
         return;
     }
 
     // If the current user changing own account ensure isAdmin retains existing
-    if(user.userEmail === req.session.user){
+    if (user.userEmail === req.session.user) {
         isAdmin = user.isAdmin;
     }
 
     // if the user we want to edit is not the current logged in user and the current user is not
     // an admin we render an access denied message
-    if(user.userEmail !== req.session.user && req.session.isAdmin === false){
+    if (user.userEmail !== req.session.user && req.session.isAdmin === false) {
         res.status(400).json({ message: 'Access denied' });
         return;
     }
@@ -156,19 +156,19 @@ router.post('/admin/user/update', restrict, async (req, res) => {
     // create the update doc
     const updateDoc = {};
     updateDoc.isAdmin = isAdmin;
-    if(req.body.usersName){
+    if (req.body.usersName) {
         updateDoc.usersName = req.body.usersName;
     }
-    if(req.body.userEmail){
+    if (req.body.userEmail) {
         updateDoc.userEmail = req.body.userEmail;
     }
-    if(req.body.userPassword){
+    if (req.body.userPassword) {
         updateDoc.userPassword = bcrypt.hashSync(req.body.userPassword);
     }
 
     // Validate update user
     const schemaResult = validateJson('editUser', updateDoc);
-    if(!schemaResult.result){
+    if (!schemaResult.result) {
         res.status(400).json({
             message: 'Failed to create user. Check inputs.',
             error: schemaResult.errors
@@ -176,27 +176,24 @@ router.post('/admin/user/update', restrict, async (req, res) => {
         return;
     }
 
-    try{
-        const updatedUser = await db.users.findOneAndUpdate(
-            { _id: common.getId(req.body.userId) },
-            {
-                $set: updateDoc
-            }, { multi: false, returnOriginal: false }
-        );
+    try {
+        const updatedUser = await db.users.findOneAndUpdate({ _id: common.getId(req.body.userId) }, {
+            $set: updateDoc
+        }, { multi: false, returnOriginal: false });
 
         const returnUser = updatedUser.value;
         delete returnUser.userPassword;
         delete returnUser.apiKey;
         res.status(200).json({ message: 'User account updated', user: updatedUser.value });
         return;
-    }catch(ex){
+    } catch (ex) {
         console.error(colors.red('Failed updating user: ' + ex));
         res.status(400).json({ message: 'Failed to update user' });
     }
 });
 
 // insert a user
-router.post('/admin/user/insert', restrict, async (req, res) => {
+router.post('/admin/user/insert', restrict, async(req, res) => {
     const db = req.app.db;
 
     // Check number of users
@@ -204,7 +201,7 @@ router.post('/admin/user/insert', restrict, async (req, res) => {
     let isAdmin = false;
 
     // if no users, setup user as admin
-    if(userCount === 0){
+    if (userCount === 0) {
         isAdmin = true;
     }
 
@@ -217,26 +214,26 @@ router.post('/admin/user/insert', restrict, async (req, res) => {
 
     // Validate new user
     const schemaResult = validateJson('newUser', userObj);
-    if(!schemaResult.result){
+    if (!schemaResult.result) {
         res.status(400).json({ message: 'Failed to create user. Check inputs.', error: schemaResult.errors });
         return;
     }
 
     // check for existing user
     const user = await db.users.findOne({ userEmail: req.body.userEmail });
-    if(user){
+    if (user) {
         console.error(colors.red('Failed to insert user, possibly already exists'));
         res.status(400).json({ message: 'A user with that email address already exists' });
         return;
     }
     // email is ok to be used.
-    try{
+    try {
         const newUser = await db.users.insertOne(userObj);
         res.status(200).json({
             message: 'User account inserted',
             userId: newUser.insertedId
         });
-    }catch(ex){
+    } catch (ex) {
         console.error(colors.red('Failed to insert user: ' + ex));
         res.status(400).json({ message: 'New user creation failed' });
     }

@@ -5,6 +5,7 @@ if (fs.existsSync('./env.yaml')) {
 }
 
 require('dotenv').config({ path: 'variables.env' });
+const mongoose = require('mongoose');
 
 const path = require('path');
 const express = require('express');
@@ -474,7 +475,7 @@ app.on('uncaughtException', (err) => {
     process.exit(2);
 });
 
-initDb(process.env.databaseConnectionString, async(err, db) => {
+initDb('mongodb+srv://paulo:1234@cluster0-ddi8n.mongodb.net/test?retryWrites=true&w=majority', async(err, db) => {
     // On connection error we display then exit
     if (err) {
         console.log(colors.red('Error connecting to MongoDB: ' + err));

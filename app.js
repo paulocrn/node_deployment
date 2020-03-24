@@ -1,8 +1,11 @@
 const fs = require('fs');
 const yenv = require('yenv');
-if(fs.existsSync('./env.yaml')){
+if (fs.existsSync('./env.yaml')) {
     process.env = yenv('env.yaml', { strict: false });
 }
+
+require('dotenv').config({ path: 'variables.env' });
+
 const path = require('path');
 const express = require('express');
 const logger = require('morgan');
@@ -32,42 +35,42 @@ const ajv = new Ajv({ useDefaults: true });
 const config = common.getConfig();
 
 const baseConfig = ajv.validate(require('./config/baseSchema'), config);
-if(baseConfig === false){
+if (baseConfig === false) {
     console.log(colors.red(`settings.json incorrect: ${ajv.errorsText()}`));
     process.exit(2);
 }
 
 // Validate the payment gateway config
-switch(config.paymentGateway){
+switch (config.paymentGateway) {
     case 'paypal':
-        if(ajv.validate(require('./config/paypalSchema'), require('./config/paypal.json')) === false){
+        if (ajv.validate(require('./config/paypalSchema'), require('./config/paypal.json')) === false) {
             console.log(colors.red(`PayPal config is incorrect: ${ajv.errorsText()}`));
             process.exit(2);
         }
         break;
 
     case 'stripe':
-        if(ajv.validate(require('./config/stripeSchema'), require('./config/stripe.json')) === false){
+        if (ajv.validate(require('./config/stripeSchema'), require('./config/stripe.json')) === false) {
             console.log(colors.red(`Stripe config is incorrect: ${ajv.errorsText()}`));
             process.exit(2);
         }
         break;
 
     case 'authorizenet':
-        if(ajv.validate(require('./config/authorizenetSchema'), require('./config/authorizenet.json')) === false){
+        if (ajv.validate(require('./config/authorizenetSchema'), require('./config/authorizenet.json')) === false) {
             console.log(colors.red(`Authorizenet config is incorrect: ${ajv.errorsText()}`));
             process.exit(2);
         }
         break;
 
     case 'adyen':
-        if(ajv.validate(require('./config/adyenSchema'), require('./config/adyen.json')) === false){
+        if (ajv.validate(require('./config/adyenSchema'), require('./config/adyen.json')) === false) {
             console.log(colors.red(`adyen config is incorrect: ${ajv.errorsText()}`));
             process.exit(2);
         }
         break;
     case 'instore':
-        if(ajv.validate(require('./config/instoreSchema'), require('./config/instore.json')) === false){
+        if (ajv.validate(require('./config/instoreSchema'), require('./config/instore.json')) === false) {
             console.log(colors.red(`instore config is incorrect: ${ajv.errorsText()}`));
             process.exit(2);
         }
@@ -122,32 +125,32 @@ handlebars = handlebars.create({
         __n: () => { return i18n.__n(this, arguments); }, // eslint-disable-line no-undef
         availableLanguages: (block) => {
             let total = '';
-            for(const lang of i18n.getLocales()){
+            for (const lang of i18n.getLocales()) {
                 total += block.fn(lang);
             }
             return total;
         },
         perRowClass: (numProducts) => {
-            if(parseInt(numProducts) === 1){
+            if (parseInt(numProducts) === 1) {
                 return 'col-6 col-md-12 product-item';
             }
-            if(parseInt(numProducts) === 2){
+            if (parseInt(numProducts) === 2) {
                 return 'col-6 col-md-6 product-item';
             }
-            if(parseInt(numProducts) === 3){
+            if (parseInt(numProducts) === 3) {
                 return 'col-6 col-md-4 product-item';
             }
-            if(parseInt(numProducts) === 4){
+            if (parseInt(numProducts) === 4) {
                 return 'col-6 col-md-3 product-item';
             }
 
             return 'col-md-6 product-item';
         },
         menuMatch: (title, search) => {
-            if(!title || !search){
+            if (!title || !search) {
                 return '';
             }
-            if(title.toLowerCase().startsWith(search.toLowerCase())){
+            if (title.toLowerCase().startsWith(search.toLowerCase())) {
                 return 'class="navActive"';
             }
             return '';
@@ -156,19 +159,19 @@ handlebars = handlebars.create({
             return `themes/${config.theme}/${view}`;
         },
         formatAmount: (amt) => {
-            if(amt){
+            if (amt) {
                 return numeral(amt).format('0.00');
             }
             return '0.00';
         },
         amountNoDecimal: (amt) => {
-            if(amt){
+            if (amt) {
                 return handlebars.helpers.formatAmount(amt).replace('.', '');
             }
             return handlebars.helpers.formatAmount(amt);
         },
         getStatusColor: (status) => {
-            switch(status){
+            switch (status) {
                 case 'Paid':
                     return 'success';
                 case 'Approved':
@@ -188,49 +191,49 @@ handlebars = handlebars.create({
             }
         },
         checkProductOptions: (opts) => {
-            if(opts){
+            if (opts) {
                 return 'true';
             }
             return 'false';
         },
         currencySymbol: (value) => {
-            if(typeof value === 'undefined' || value === ''){
+            if (typeof value === 'undefined' || value === '') {
                 return '$';
             }
             return value;
         },
         objectLength: (obj) => {
-            if(obj){
+            if (obj) {
                 return Object.keys(obj).length;
             }
             return 0;
         },
         stringify: (obj) => {
-            if(obj){
+            if (obj) {
                 return JSON.stringify(obj);
             }
             return '';
         },
         checkedState: (state) => {
-            if(state === 'true' || state === true){
+            if (state === 'true' || state === true) {
                 return 'checked';
             }
             return '';
         },
         selectState: (state, value) => {
-            if(state === value){
+            if (state === value) {
                 return 'selected';
             }
             return '';
         },
         isNull: (value, options) => {
-            if(typeof value === 'undefined' || value === ''){
+            if (typeof value === 'undefined' || value === '') {
                 return options.fn(this);
             }
             return options.inverse(this);
         },
         toLower: (value) => {
-            if(value){
+            if (value) {
                 return value.toLowerCase();
             }
             return null;
@@ -242,7 +245,7 @@ handlebars = handlebars.create({
             return moment().isBetween(moment(start), moment(end));
         },
         ifCond: (v1, operator, v2, options) => {
-            switch(operator){
+            switch (operator) {
                 case '==':
                     return (v1 === v2) ? options.fn(this) : options.inverse(this);
                 case '!=':
@@ -266,18 +269,18 @@ handlebars = handlebars.create({
             }
         },
         isAnAdmin: (value, options) => {
-            if(value === 'true' || value === true){
+            if (value === 'true' || value === true) {
                 return options.fn(this);
             }
             return options.inverse(this);
         },
         paymentMessage: (status) => {
-            if(status === 'Paid'){
+            if (status === 'Paid') {
                 return '<h2 class="text-success">Your payment has been successfully processed</h2>';
             }
-            if(status === 'Pending'){
+            if (status === 'Pending') {
                 const paymentConfig = common.getPaymentConfig();
-                if(config.paymentGateway === 'instore'){
+                if (config.paymentGateway === 'instore') {
                     return `<h2 class="text-warning">${paymentConfig.resultMessage}</h2>`;
                 }
                 return '<h2 class="text-warning">The payment for this order is pending. We will be in contact shortly.</h2>';
@@ -285,13 +288,13 @@ handlebars = handlebars.create({
             return '<h2 class="text-success">Your payment has failed. Please try again or contact us.</h2>';
         },
         paymentOutcome: (status) => {
-            if(status === 'Paid' || status === 'Pending'){
+            if (status === 'Paid' || status === 'Pending') {
                 return '<h5 class="text-warning">Please retain the details above as a reference of payment</h5>';
             }
             return '';
         },
         upperFirst: (value) => {
-            if(value){
+            if (value) {
                 return value.replace(/^\w/, (chr) => {
                     return chr.toUpperCase();
                 });
@@ -311,13 +314,13 @@ handlebars = handlebars.create({
             }[operator];
         },
         showCartButtons: (cart) => {
-            if(!cart){
+            if (!cart) {
                 return 'd-none';
             }
             return '';
         },
         snip: (text) => {
-            if(text && text.length > 155){
+            if (text && text.length > 155) {
                 return text.substring(0, 155) + '...';
             }
             return text;
@@ -347,17 +350,17 @@ handlebars = handlebars.create({
 
 // session store
 const store = new MongoStore({
-    uri: getDbUri(config.databaseConnectionString),
+    uri: getDbUri(process.env.databaseConnectionString),
     collection: 'sessions'
 });
 
 // Setup secrets
-if(!config.secretCookie || config.secretCookie === ''){
+if (!config.secretCookie || config.secretCookie === '') {
     const randomString = crypto.randomBytes(20).toString('hex');
     config.secretCookie = randomString;
     common.updateConfigLocal({ secretCookie: randomString });
 }
-if(!config.secretSession || config.secretSession === ''){
+if (!config.secretSession || config.secretSession === '') {
     const randomString = crypto.randomBytes(20).toString('hex');
     config.secretSession = randomString;
     common.updateConfigLocal({ secretSession: randomString });
@@ -384,7 +387,7 @@ app.use(session({
 app.use(bodyParser.json({
     // Only on Stripe URL's which need the rawBody
     verify: (req, res, buf) => {
-        if(req.originalUrl === '/stripe/subscription_update'){
+        if (req.originalUrl === '/stripe/subscription_update') {
             req.rawBody = buf.toString();
         }
     }
@@ -435,7 +438,7 @@ app.use((req, res, next) => {
 
 // development error handler
 // will print stacktrace
-if(app.get('env') === 'development'){
+if (app.get('env') === 'development') {
     app.use((err, req, res, next) => {
         console.error(colors.red(err.stack));
         res.status(err.status || 500);
@@ -461,7 +464,7 @@ app.use((err, req, res, next) => {
 
 // Nodejs version check
 const nodeVersionMajor = parseInt(process.version.split('.')[0].replace('v', ''));
-if(nodeVersionMajor < 7){
+if (nodeVersionMajor < 7) {
     console.log(colors.red(`Please use Node.js version 7.x or above. Current version: ${nodeVersionMajor}`));
     process.exit(2);
 }
@@ -471,9 +474,9 @@ app.on('uncaughtException', (err) => {
     process.exit(2);
 });
 
-initDb(config.databaseConnectionString, async (err, db) => {
+initDb(config.databaseConnectionString, async(err, db) => {
     // On connection error we display then exit
-    if(err){
+    if (err) {
         console.log(colors.red('Error connecting to MongoDB: ' + err));
         process.exit(2);
     }
@@ -484,7 +487,7 @@ initDb(config.databaseConnectionString, async (err, db) => {
     app.port = app.get('port');
 
     // Fire up the cron job to clear temp held stock
-    cron.schedule('*/1 * * * *', async () => {
+    cron.schedule('*/1 * * * *', async() => {
         const validSessions = await db.sessions.find({}).toArray();
         const validSessionIds = [];
         _.forEach(validSessions, (value) => {
@@ -498,7 +501,7 @@ initDb(config.databaseConnectionString, async (err, db) => {
     });
 
     // Set trackStock for testing
-    if(process.env.NODE_ENV === 'test'){
+    if (process.env.NODE_ENV === 'test') {
         config.trackStock = true;
     }
 
@@ -506,22 +509,27 @@ initDb(config.databaseConnectionString, async (err, db) => {
     await addSchemas();
 
     // We index when not in test env
-    if(process.env.NODE_ENV !== 'test'){
-        try{
+    if (process.env.NODE_ENV !== 'test') {
+        try {
             await runIndexing(app);
-        }catch(ex){
+        } catch (ex) {
             console.error(colors.red('Error setting up indexes:' + err));
         }
     }
 
+    const host = process.env.HOST || '0.0.0.0';
+    const port = process.env.PORT || 1111;
+
     // Start the app
-    try{
-        await app.listen(app.get('port'));
+    try {
+        await app.listen(port, host, () => {
+            console.log('El servidor esta funcionando');
+        });
         app.emit('appStarted');
-        if(process.env.NODE_ENV !== 'test'){
+        if (process.env.NODE_ENV !== 'test') {
             console.log(colors.green('expressCart running on host: http://localhost:' + app.get('port')));
         }
-    }catch(ex){
+    } catch (ex) {
         console.error(colors.red('Error starting expressCart app:' + err));
         process.exit(2);
     }
